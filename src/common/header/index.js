@@ -48,6 +48,7 @@ import {
 class Header extends Component{
 
     render(){
+        
         return(
             <HeaderWrapper>
                 <Logo></Logo>
@@ -62,13 +63,13 @@ class Header extends Component{
                         >
                             <NavSearch
                                 className={this.props.focused?"focused":''}
-                                onFocus={this.props.handleInputFocus}
+                                onFocus={()=>this.props.handleInputFocus((this.props.list))}
                                 onBlur={this.props.handleInputBlur}
                             ></NavSearch>
                         </CSSTransition>
-                        <i  className={this.props.focused?"focused iconfont":'iconfont'}>&#xe624;</i>
+                        <i  className={this.props.focused?"focused iconfont zoom":'iconfont zoom'}>&#xe624;</i>
                         {this.getListArea(this.props.focused)}
-                    </SearchWrapper>
+                    </SearchWrapper> 
                     <NavItem className="right">登陆</NavItem>
                     <NavItem className="right">
                         <i className = "iconfont">&#xe636;</i>
@@ -87,20 +88,32 @@ class Header extends Component{
 
 
     getListArea =(show) =>{
-        if(show){
+        const {page,list,mouse,totalPage} = this.props;
+        const jsList = list.toJS();   //转化为普通的js类型，原本是immbate类型
+        const pageList = []
+        if(show||mouse){
+            for(var i = (page-1)*10;i<page*10;i++){
+                pageList.push(jsList[i])
+            }
+           
             return(
-                <SearchInfo >
+                <SearchInfo 
+                onMouseEnter={this.props.handeleOver}
+                onMouseLeave={this.props.handeleleave}
+                >
                 <SearchInfoTitle>
                     热门搜索
-                    <SearchInfoSwitch>
+                    <SearchInfoSwitch
+                        onClick = {()=>this.props.handeChangePage(page,totalPage,this.spinIcon)}
+                    >
+                         <i ref={(icon)=>{this.spinIcon=icon}}  className='iconfont  spin'>&#xe851;</i>
                         换一批
                     </SearchInfoSwitch>
                 </SearchInfoTitle>
                 <SearchInfoList>
-                    <SearchInfoItem>教育</SearchInfoItem>
                    {
-                    this.props.list.map((item,index)=>{
-                            return <SearchInfoItem>item</SearchInfoItem>    
+                   pageList.map((item,index)=>{
+                            return <SearchInfoItem key={index}>{item}</SearchInfoItem>    
                     })
                    }
                 </SearchInfoList>
@@ -113,38 +126,53 @@ class Header extends Component{
 }
 
 
-// class Header extends Component{
-
-//     render(){
- 
-//     }
-
-//     handleInputFocus(){
-//         this.setState({
-//             focused:true
-//         })
-//     }
-//     handleInputBlur(){
-//         this.setState({
-//             focused:false
-//         })
-//     }
-// }
 
 const mapStateToProps= (state)=>{  //这个就是获取，
     return{
-        focused:state.get('header').get('focused')    
+        focused:state.get('header').get('focused'),
+        list:state.get('header').get('list'),
+        page:state.get('header').get('page'),
+        totalPage:state.get('header').get('totalPage'),
+        mouse:state.get('header').get('mouse')   
     }
 }
 const mapDispathToProps=(dispatch)=>{  //这个就是改变
     return{
-        handleInputFocus(){
-            dispatch(actionCreators.getList());
+        handleInputFocus(list){
+          
+            if(list.size===0){
+                dispatch(actionCreators.getList());
+            }
+     
             const action = actionCreators.SearchFocus()
             dispatch(action)
         },
         handleInputBlur(){
+
             const action  = actionCreators.SearchBlur()
+            dispatch(action)
+        },
+        handeleOver(){
+            const action = actionCreators.handeOver();
+            dispatch(action)
+        },
+        handeleleave(){
+            const action = actionCreators.handeLeave();
+            dispatch(action)
+        },
+        handeChangePage(page,totalPage,icon){  //点击换一换
+            let originAngle = icon.style.transform.replace(/[^0-9]/ig,'');
+            if(originAngle){
+                originAngle=parseInt(originAngle,10);
+            }else{
+                originAngle=0;
+            }
+            icon.style.transform='rotate('+(originAngle+360)+'deg)'
+           if(page===totalPage){
+               page=1;
+           }
+            const action = actionCreators.handeChangePageaction(page)
+          
             dispatch(action)
         }
     }   

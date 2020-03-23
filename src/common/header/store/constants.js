@@ -1,3 +1,6 @@
 export const SEARCH_FOCUS = 'header/SEARCH_FOCUS'
 export const SEARCH_BLUR = 'header/SEARCH_BLUR'
 export const CHANGELIST = 'header/CHANGELIST'
+export const HANDOVER = 'header/HANDOVER'
+export const HANDLEAVE = 'header/HANDLEAVE'
+export const HANDECHANGEPAGE = 'header/HANDECHANGEPAGE'

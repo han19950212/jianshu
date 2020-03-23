@@ -1,5 +1,6 @@
 import * as constants from './constants';
 import axios from 'axios';
+import {fromJS} from 'immutable';
 export const SearchFocus = ()=>({
     type:constants.SEARCH_FOCUS
 });
@@ -10,7 +11,8 @@ export const SearchBlur = ()=>({
 
 const changeList = (data)=> ({
     type:constants.CHANGELIST,
-    data:data
+    data:fromJS(data),
+    totalPage:Math.ceil(data.length/10)
 })
 export const getList = () =>{
     return (dispatch)=>{  //返回一个函数
@@ -26,3 +28,16 @@ export const getList = () =>{
         })
     }
 };
+
+export  const handeOver = ()=>({
+    type:constants.HANDOVER,
+}); 
+
+export const handeLeave=()=>({
+    type:constants.HANDLEAVE,
+})
+
+export const handeChangePageaction = (data)=>({
+    type:constants.HANDECHANGEPAGE,
+    page:data
+})
